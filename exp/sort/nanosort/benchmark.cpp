@@ -7,7 +7,7 @@
 #include <vector>
 
 /* Index sort. Supposed to be branch-less on small N */
-template <size_t N> 
+template <size_t N>
 void index_sort(std::array<int, N>& t) {
     std::array<int, N> a = t;
     for(auto i = 0u; i < N; ++i) {
@@ -23,7 +23,7 @@ void index_sort(std::array<int, N>& t) {
 }
 
 /* Index sort with presumably shorter index types */
-template <size_t N> 
+template <size_t N>
 void index_sort_fast_t(std::array<int, N>& t) {
     std::array<int, N> a = t;
     for(uint_fast8_t i = 0u; i < N; ++i) {
@@ -55,6 +55,18 @@ void swap_sort_no_ifs(std::array<int, 3>& t) {
         const auto temp = std::min(a, b);
         b = std::max(a, b);
         a = temp;
+    };
+    sort_(t[0], t[1]);
+    sort_(t[1], t[2]);
+    sort_(t[0], t[1]);
+}
+
+/* Sum-min instead of ifs */
+void swap_sort_no_ifs2(std::array<int, 3>& t) {
+    auto sort_ = [](auto& a, auto& b) {
+        const auto sum = a + b;
+        a = std::min(a, b);
+        b = sum - a;
     };
     sort_(t[0], t[1]);
     sort_(t[1], t[2]);
@@ -133,6 +145,7 @@ int main() {
     MEASURE(index_sort_fast_t(t);, "templated index sort fast_t");
     MEASURE(swap_sort(t);, "swap-sort");
     MEASURE(swap_sort_no_ifs(t);, "swap-sort no ifs");
+    MEASURE(swap_sort_no_ifs2(t);, "swap-sort no ifs, sum-min");
     MEASURE(swap_sort_arithmetic_hack(t);, "swap-sort arithmetic hack");
     MEASURE(swap_sort_bit_hack(t);, "swap-sort bit hack");
 }
